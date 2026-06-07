@@ -1,0 +1,16 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 3
+    groups:
+      opentelemetry:
+        patterns:
+          - '@opentelemetry/*'
+      hono:
+        patterns:
+          - hono
+          - '@hono/*'
