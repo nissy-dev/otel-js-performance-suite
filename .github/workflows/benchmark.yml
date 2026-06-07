@@ -1,0 +1,119 @@
+name: Benchmark
+
+on:
+  schedule:
+    - cron: '0 3 * * 0'
+  push:
+    branches: [main]
+    paths:
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'apps/**'
+      - 'benchmark/**'
+      - 'docker/**'
+      - 'site/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: benchmark-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['22', '24']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Start OpenTelemetry Collector
+        run: docker compose up -d otel-collector
+
+      - name: Run benchmark
+        env:
+          BENCHMARK_OUTPUT_SUFFIX: ${{ matrix.node }}
+        run: pnpm run benchmark
+
+      - name: Upload benchmark result
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-node-${{ matrix.node }}
+          path: results/latest-node${{ matrix.node }}.json
+          if-no-files-found: error
+
+  merge-and-deploy:
+    needs: benchmark
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download benchmark artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifact-results
+          pattern: benchmark-node-*
+          merge-multiple: true
+
+      - name: Place latest result files
+        run: |
+          mkdir -p results
+          cp artifact-results/latest-node*.json results/
+
+      - name: Merge history
+        run: pnpm run merge-history
+
+      - name: Update site data
+        run: cp results/history.json site/data/history.json
+
+      - name: Commit benchmark results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add results/
+          git diff --staged --quiet || git commit -m "chore: update benchmark results"
+          git push
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
