@@ -1,0 +1,15 @@
+{
+  "name": "otel-js-performance-suite",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "benchmark": "tsx benchmark/run.ts",
+    "merge-history": "tsx benchmark/merge-history.ts",
+    "server": "tsx apps/server/src/index.ts"
+  },
+  "devDependencies": {
+    "autocannon": "^8.0.0",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}
