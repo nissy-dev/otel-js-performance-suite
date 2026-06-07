@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hono + OpenTelemetry Benchmark</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: system-ui, sans-serif;
+        line-height: 1.5;
+      }
+      body {
+        margin: 0 auto;
+        max-width: 1100px;
+        padding: 1.5rem;
+      }
+      h1 {
+        margin-bottom: 0.25rem;
+      }
+      .subtitle {
+        color: #666;
+        margin-top: 0;
+      }
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      label {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.9rem;
+      }
+      select {
+        min-width: 12rem;
+        padding: 0.4rem 0.5rem;
+      }
+      canvas {
+        max-height: 420px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 2rem;
+        font-size: 0.9rem;
+      }
+      th,
+      td {
+        border-bottom: 1px solid #ccc;
+        padding: 0.5rem;
+        text-align: left;
+      }
+      .error {
+        color: #b00020;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Hono + OpenTelemetry Benchmark</h1>
+    <p class="subtitle">
+      Throughput and latency of plain Hono vs OpenTelemetry SDK configurations (OTLP → Collector).
+    </p>
+
+    <div class="controls">
+      <label>
+        Node version
+        <select id="nodeFilter"></select>
+      </label>
+      <label>
+        Metric
+        <select id="metricFilter">
+          <option value="requestsPerSec.average">Requests/sec (avg)</option>
+          <option value="latencyMs.p50">Latency p50 (ms)</option>
+          <option value="latencyMs.p99">Latency p99 (ms)</option>
+        </select>
+      </label>
+    </div>
+
+    <canvas id="chart"></canvas>
+    <p id="status"></p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Node</th>
+          <th>OTel SDK</th>
+          <th>Hono</th>
+          <th>Commit</th>
+        </tr>
+      </thead>
+      <tbody id="runsTable"></tbody>
+    </table>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
