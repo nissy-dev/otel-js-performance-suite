@@ -26,7 +26,7 @@ All variants run the same `GET /` handler (outbound `fetch` to a local dummy ser
 
 ## Local run
 
-Requires Node.js, pnpm, and Docker.
+Requires Node.js LTS, pnpm, and Docker.
 
 ```bash
 corepack enable
@@ -56,8 +56,8 @@ BENCH_VARIANT=trace pnpm run server
 ## CI and dashboard
 
 - Workflow: [`.github/workflows/benchmark.yml`](.github/workflows/benchmark.yml)
-- Runs weekly (Sunday 03:00 UTC), on relevant pushes to `main`, and manually
-- Node.js matrix: 22.x and 24.x
+- Runs on pushes to `main` (when `package.json` changes) and manually
+- Node.js: LTS (`lts/*` in CI)
 - Results committed to `results/` and deployed to GitHub Pages
 
 ### GitHub Pages setup
