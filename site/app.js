@@ -3,11 +3,7 @@ const VARIANT_COLORS = {
   trace: '#f28e2b',
   metrics: '#e15759',
   logs: '#76b7b2',
-  'trace-metrics': '#59a14f',
   full: '#edc948',
-  'auto-http': '#b07aa1',
-  'hono-otel': '#ff9da7',
-  'auto-hono-otel': '#9c755f',
 }
 
 const nodeFilter = document.getElementById('nodeFilter')

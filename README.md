@@ -6,7 +6,7 @@ Results are collected in CI and published to GitHub Pages.
 
 ## What is measured
 
-- **Endpoint**: `GET /` only (single handler returning `Request ID: <random>`)
+- **Endpoint**: `GET /`, which fetches a local dummy server then returns `Request ID: <random>`
 - **Load test**: [autocannon](https://github.com/mcollina/autocannon) with `-c 100 -p 10 -d 10` and a 5s warmup
 - **Telemetry**: OTLP HTTP export to a local OpenTelemetry Collector (Docker), including export overhead
 
@@ -17,14 +17,12 @@ This measures a production-like setup, not in-memory/no-op exporters.
 | `BENCH_VARIANT` | Description |
 |-----------------|-------------|
 | `baseline` | Hono only, no OpenTelemetry |
-| `trace` | Node SDK with traces → OTLP |
-| `metrics` | Node SDK with metrics → OTLP |
+| `trace` | `HttpInstrumentation` (incoming + outbound HTTP) → OTLP |
+| `metrics` | `http.server.incoming_requests` counter per request → OTLP |
 | `logs` | Logs SDK with request logs → OTLP |
-| `trace-metrics` | Traces + metrics |
-| `full` | Traces + metrics + logs |
-| `auto-http` | HTTP auto-instrumentation only |
-| `hono-otel` | `@hono/otel` middleware |
-| `auto-hono-otel` | HTTP auto-instrumentation + `@hono/otel` |
+| `full` | `HttpInstrumentation` traces + metrics + logs |
+
+All variants run the same `GET /` handler (outbound `fetch` to a local dummy server).
 
 ## Local run
 
@@ -48,9 +46,10 @@ To merge into history:
 pnpm run merge-history
 ```
 
-To run a single server variant manually:
+To run a single server variant manually (dummy server in a separate terminal):
 
 ```bash
+pnpm run dummy-server
 BENCH_VARIANT=trace pnpm run server
 ```
 

@@ -5,7 +5,8 @@
   "scripts": {
     "benchmark": "tsx benchmark/run.ts",
     "merge-history": "tsx benchmark/merge-history.ts",
-    "server": "tsx apps/server/src/index.ts"
+    "server": "tsx apps/server/src/index.ts",
+    "dummy-server": "tsx apps/server/src/dummy-server/index.ts"
   },
   "devDependencies": {
     "autocannon": "8.0.0",

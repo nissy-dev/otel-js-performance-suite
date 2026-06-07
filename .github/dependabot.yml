@@ -10,7 +10,6 @@ updates:
       opentelemetry:
         patterns:
           - '@opentelemetry/*'
-          - '@hono/otel'
       hono:
         patterns:
           - hono

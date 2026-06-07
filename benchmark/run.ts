@@ -1,5 +1,5 @@
 import autocannon from 'autocannon'
-import { execSync, spawn } from 'node:child_process'
+import { execSync, spawn, type ChildProcess } from 'node:child_process'
 import { writeFileSync, mkdirSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { dirname, join } from 'node:path'
@@ -11,8 +11,12 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const rootDir = join(__dirname, '..')
 const resultsDir = join(rootDir, 'results')
 const serverEntry = join(rootDir, 'apps/server/src/index.ts')
+const dummyServerEntry = join(rootDir, 'apps/server/src/dummy-server/index.ts')
 const port = Number(process.env.PORT ?? 3000)
-const baseUrl = `http://localhost:${port}/`
+const dummyServerPort = Number(process.env.DUMMY_SERVER_PORT ?? 3099)
+const dummyServerUrl = `http://127.0.0.1:${dummyServerPort}`
+const baseUrl = `http://localhost:${port}`
+const benchUrl = `${baseUrl}/`
 
 function runCommand(command: string, options?: { cwd?: string }) {
   execSync(command, { stdio: 'inherit', cwd: options?.cwd ?? rootDir })
@@ -37,12 +41,12 @@ async function waitForCollector(timeoutMs = 30_000): Promise<void> {
   throw new Error(`OpenTelemetry Collector did not become ready at ${endpoint}`)
 }
 
-async function waitForServer(timeoutMs = 15_000): Promise<void> {
+async function waitForDummyServer(timeoutMs = 15_000): Promise<void> {
   const deadline = Date.now() + timeoutMs
 
   while (Date.now() < deadline) {
     try {
-      const response = await fetch(baseUrl)
+      const response = await fetch(dummyServerUrl)
       if (response.ok) {
         return
       }
@@ -52,7 +56,25 @@ async function waitForServer(timeoutMs = 15_000): Promise<void> {
     await sleep(200)
   }
 
-  throw new Error(`Server did not become ready at ${baseUrl}`)
+  throw new Error(`Dummy server did not become ready at ${dummyServerUrl}`)
+}
+
+async function waitForServer(timeoutMs = 15_000): Promise<void> {
+  const deadline = Date.now() + timeoutMs
+
+  while (Date.now() < deadline) {
+    try {
+      const response = await fetch(benchUrl)
+      if (response.ok) {
+        return
+      }
+    } catch {
+      // retry
+    }
+    await sleep(200)
+  }
+
+  throw new Error(`Server did not become ready at ${benchUrl}`)
 }
 
 function sleep(ms: number) {
@@ -76,9 +98,11 @@ function getCommit(): string | undefined {
   }
 }
 
-async function runAutocannon(): Promise<Pick<VariantResult, 'requestsPerSec' | 'latencyMs'>> {
+async function runAutocannon(
+  url: string,
+): Promise<Pick<VariantResult, 'requestsPerSec' | 'latencyMs'>> {
   const result = await autocannon({
-    url: baseUrl,
+    url,
     connections: 100,
     pipelining: 10,
     duration: 10,
@@ -99,42 +123,65 @@ async function runAutocannon(): Promise<Pick<VariantResult, 'requestsPerSec' | '
   }
 }
 
+function spawnManagedProcess(
+  entry: string,
+  env: NodeJS.ProcessEnv,
+): ChildProcess {
+  return spawn('pnpm', ['exec', 'tsx', entry], {
+    cwd: rootDir,
+    env,
+    stdio: ['ignore', 'pipe', 'pipe'],
+  })
+}
+
+async function stopManagedProcess(child: ChildProcess): Promise<void> {
+  child.kill('SIGTERM')
+  await new Promise<void>((resolve) => {
+    const timer = setTimeout(() => {
+      child.kill('SIGKILL')
+      resolve()
+    }, 3000)
+    child.on('exit', () => {
+      clearTimeout(timer)
+      resolve()
+    })
+  })
+}
+
+async function startDummyServer(): Promise<ChildProcess> {
+  const child = spawnManagedProcess(dummyServerEntry, {
+    ...process.env,
+    DUMMY_SERVER_PORT: String(dummyServerPort),
+  })
+
+  try {
+    await waitForDummyServer()
+    return child
+  } catch (error) {
+    await stopManagedProcess(child)
+    throw error
+  }
+}
+
 async function benchmarkVariant(variant: (typeof BENCH_VARIANTS)[number]): Promise<VariantResult> {
-  const child = spawn(
-    'pnpm',
-    ['exec', 'tsx', serverEntry],
-    {
-      cwd: rootDir,
-      env: {
-        ...process.env,
-        BENCH_VARIANT: variant,
-        PORT: String(port),
-        OTEL_EXPORTER_OTLP_ENDPOINT: process.env.OTEL_EXPORTER_OTLP_ENDPOINT ?? 'http://localhost:4318',
-      },
-      stdio: ['ignore', 'pipe', 'pipe'],
-    },
-  )
+  const child = spawnManagedProcess(serverEntry, {
+    ...process.env,
+    BENCH_VARIANT: variant,
+    PORT: String(port),
+    DUMMY_SERVER_URL: dummyServerUrl,
+    OTEL_EXPORTER_OTLP_ENDPOINT: process.env.OTEL_EXPORTER_OTLP_ENDPOINT ?? 'http://localhost:4318',
+  })
 
   try {
     await waitForServer()
-    const stats = await runAutocannon()
+    const stats = await runAutocannon(benchUrl)
     return {
       variant,
       requestsPerSec: stats.requestsPerSec,
       latencyMs: stats.latencyMs,
     }
   } finally {
-    child.kill('SIGTERM')
-    await new Promise<void>((resolve) => {
-      const timer = setTimeout(() => {
-        child.kill('SIGKILL')
-        resolve()
-      }, 3000)
-      child.on('exit', () => {
-        clearTimeout(timer)
-        resolve()
-      })
-    })
+    await stopManagedProcess(child)
   }
 }
 
@@ -164,19 +211,26 @@ async function main() {
     results: [],
   }
 
-  for (const variant of BENCH_VARIANTS) {
-    console.log(`\n=== Benchmarking variant: ${variant} ===`)
-    const result = await benchmarkVariant(variant)
-    run.results.push(result)
-    console.log(
-      `  req/sec avg: ${result.requestsPerSec.average.toFixed(0)}, latency p50: ${result.latencyMs.p50.toFixed(1)}ms`,
-    )
-  }
+  console.log('Starting dummy server...')
+  const dummyServer = await startDummyServer()
 
-  mkdirSync(resultsDir, { recursive: true })
-  const outputPath = join(resultsDir, outputName)
-  writeFileSync(outputPath, `${JSON.stringify(run, null, 2)}\n`)
-  console.log(`\nWrote ${outputPath}`)
+  try {
+    for (const variant of BENCH_VARIANTS) {
+      console.log(`\n=== Benchmarking variant: ${variant} ===`)
+      const result = await benchmarkVariant(variant)
+      run.results.push(result)
+      console.log(
+        `  req/sec avg: ${result.requestsPerSec.average.toFixed(0)}, latency p50: ${result.latencyMs.p50.toFixed(1)}ms`,
+      )
+    }
+
+    mkdirSync(resultsDir, { recursive: true })
+    const outputPath = join(resultsDir, outputName)
+    writeFileSync(outputPath, `${JSON.stringify(run, null, 2)}\n`)
+    console.log(`\nWrote ${outputPath}`)
+  } finally {
+    await stopManagedProcess(dummyServer)
+  }
 
   if (!skipDocker && process.env.KEEP_COLLECTOR !== '1') {
     runCommand('docker compose down')

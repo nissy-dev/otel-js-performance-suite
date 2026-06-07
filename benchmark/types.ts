@@ -3,22 +3,14 @@ export type BenchVariant =
   | 'trace'
   | 'metrics'
   | 'logs'
-  | 'trace-metrics'
   | 'full'
-  | 'auto-http'
-  | 'hono-otel'
-  | 'auto-hono-otel'
 
 export const BENCH_VARIANTS: BenchVariant[] = [
   'baseline',
   'trace',
   'metrics',
   'logs',
-  'trace-metrics',
   'full',
-  'auto-http',
-  'hono-otel',
-  'auto-hono-otel',
 ]
 
 export interface HistogramStats {
