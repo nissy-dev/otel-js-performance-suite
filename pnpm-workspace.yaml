@@ -1,5 +1,6 @@
 packages:
   - "apps/*"
+saveExact: true
 allowBuilds:
   esbuild: true
   protobufjs: true

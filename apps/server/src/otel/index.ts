@@ -1,5 +1,5 @@
 import type { MiddlewareHandler } from 'hono'
-import { otel } from '@hono/otel'
+import { httpInstrumentationMiddleware } from '@hono/otel'
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http'
 import { NodeSDK } from '@opentelemetry/sdk-node'
 import { logs } from '@opentelemetry/api-logs'
@@ -145,7 +145,7 @@ export function getHonoMiddleware(): MiddlewareHandler[] {
   }
 
   if (variant === 'hono-otel' || variant === 'auto-hono-otel') {
-    middleware.push(otel())
+    middleware.push(httpInstrumentationMiddleware({ serviceName: SERVICE_NAME }))
   }
 
   return middleware
