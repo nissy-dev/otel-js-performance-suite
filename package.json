@@ -6,9 +6,13 @@
     "benchmark": "tsx benchmark/run.ts",
     "merge-history": "tsx benchmark/merge-history.ts",
     "server": "tsx apps/server/src/index.ts",
-    "dummy-server": "tsx apps/server/src/dummy-server/index.ts"
+    "dummy-server": "tsx apps/server/src/dummy-server/index.ts",
+    "profile:0x:full": "BENCH_VARIANT=full tsx benchmark/profile.ts 0x",
+    "profile:flame:full": "BENCH_VARIANT=full tsx benchmark/profile.ts flame"
   },
   "devDependencies": {
+    "@platformatic/flame": "1.6.0",
+    "0x": "6.0.0",
     "autocannon": "8.0.0",
     "tsx": "4.22.4",
     "typescript": "6.0.3"

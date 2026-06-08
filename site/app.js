@@ -6,7 +6,6 @@ const VARIANT_COLORS = {
   full: '#edc948',
 }
 
-const nodeFilter = document.getElementById('nodeFilter')
 const metricFilter = document.getElementById('metricFilter')
 const statusEl = document.getElementById('status')
 const runsTable = document.getElementById('runsTable')
@@ -24,16 +23,8 @@ function formatTimestamp(value) {
   return new Date(value).toLocaleString()
 }
 
-function populateNodeFilter() {
-  const versions = [...new Set(history.runs.map((run) => run.nodeVersion))].sort()
-  nodeFilter.innerHTML = ''
-
-  for (const version of versions) {
-    const option = document.createElement('option')
-    option.value = version
-    option.textContent = version
-    nodeFilter.appendChild(option)
-  }
+function getSortedRuns() {
+  return [...history.runs].sort((a, b) => a.timestamp.localeCompare(b.timestamp))
 }
 
 function populateRunsTable(runs) {
@@ -53,12 +44,8 @@ function populateRunsTable(runs) {
 }
 
 function renderChart() {
-  const nodeVersion = nodeFilter.value
   const metricPath = metricFilter.value
-  const runs = history.runs
-    .filter((run) => run.nodeVersion === nodeVersion)
-    .sort((a, b) => a.timestamp.localeCompare(b.timestamp))
-
+  const runs = getSortedRuns()
   const variants = [...new Set(runs.flatMap((run) => run.results.map((item) => item.variant)))]
 
   const labels = runs.map((run) => formatTimestamp(run.timestamp))
@@ -87,7 +74,7 @@ function renderChart() {
         legend: { position: 'bottom' },
         title: {
           display: true,
-          text: `${metricPath} (${nodeVersion})`,
+          text: metricPath,
         },
       },
       scales: {
@@ -108,8 +95,6 @@ async function init() {
       throw new Error(`Failed to load history.json (${response.status})`)
     }
     history = await response.json()
-    populateNodeFilter()
-    nodeFilter.addEventListener('change', renderChart)
     metricFilter.addEventListener('change', renderChart)
     renderChart()
     statusEl.textContent = `${history.runs.length} benchmark runs loaded.`

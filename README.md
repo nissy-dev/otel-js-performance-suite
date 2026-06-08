@@ -53,10 +53,30 @@ pnpm run dummy-server
 BENCH_VARIANT=trace pnpm run server
 ```
 
+## Profiling (flamegraphs)
+
+Capture flamegraphs for the `full` variant with a few sample requests (default: 5). Outputs go to `profiles/full/<tool>/`.
+
+```bash
+pnpm install
+docker compose up -d otel-collector
+
+# 0x: opens flamegraph.html in the browser
+pnpm run profile:0x:full
+
+# flame: CPU + heap profiles and HTML flamegraphs
+pnpm run profile:flame:full
+
+# change request count
+PROFILE_REQUESTS=10 pnpm run profile:0x:full
+```
+
+Set `SKIP_DOCKER=1` to profile without the Collector when isolating in-process overhead.
+
 ## CI and dashboard
 
 - Workflow: [`.github/workflows/benchmark.yml`](.github/workflows/benchmark.yml)
-- Runs on pushes to `main` (when `package.json` changes) and manually
+- Runs every 3 days (03:00 UTC), on pushes to `main` (when `package.json` changes), and manually
 - Node.js: LTS (`lts/*` in CI)
 - Results committed to `results/` and deployed to GitHub Pages
 

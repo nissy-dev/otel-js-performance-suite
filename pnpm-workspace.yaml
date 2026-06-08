@@ -2,5 +2,6 @@ packages:
   - "apps/*"
 saveExact: true
 allowBuilds:
+  '@datadog/pprof': true
   esbuild: true
   protobufjs: true
