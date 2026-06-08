@@ -6,10 +6,13 @@ const VARIANT_COLORS = {
   full: '#edc948',
 }
 
-const nodeFilter = document.getElementById('nodeFilter')
+const VARIANT_ORDER = ['baseline', 'trace', 'metrics', 'logs', 'full']
+
 const metricFilter = document.getElementById('metricFilter')
+const viewFilter = document.getElementById('viewFilter')
 const statusEl = document.getElementById('status')
 const runsTable = document.getElementById('runsTable')
+const comparisonTable = document.getElementById('comparisonTable')
 const chartCanvas = document.getElementById('chart')
 
 let history = { runs: [] }
@@ -20,20 +23,66 @@ function getMetricValue(result, metricPath) {
   return result[group]?.[field]
 }
 
+function getBaselineResult(run) {
+  return run.results.find((item) => item.variant === 'baseline')
+}
+
+function getPercentOfBaseline(value, baselineValue) {
+  if (value == null || baselineValue == null || baselineValue === 0) {
+    return null
+  }
+  return (value / baselineValue) * 100
+}
+
 function formatTimestamp(value) {
   return new Date(value).toLocaleString()
 }
 
-function populateNodeFilter() {
-  const versions = [...new Set(history.runs.map((run) => run.nodeVersion))].sort()
-  nodeFilter.innerHTML = ''
-
-  for (const version of versions) {
-    const option = document.createElement('option')
-    option.value = version
-    option.textContent = version
-    nodeFilter.appendChild(option)
+function formatAbsoluteValue(metricPath, value) {
+  if (value == null) {
+    return '-'
   }
+  if (metricPath.startsWith('latency')) {
+    return `${value.toFixed(1)} ms`
+  }
+  return value.toFixed(0)
+}
+
+function formatPercent(value) {
+  if (value == null) {
+    return '-'
+  }
+  return `${value.toFixed(1)}%`
+}
+
+function formatDelta(percent) {
+  if (percent == null) {
+    return '-'
+  }
+  if (percent === 100) {
+    return '0.0%'
+  }
+  const delta = percent - 100
+  const sign = delta > 0 ? '+' : ''
+  return `${sign}${delta.toFixed(1)}%`
+}
+
+function getDeltaClass(metricPath, percent) {
+  if (percent == null || percent === 100) {
+    return ''
+  }
+
+  const isThroughput = metricPath.startsWith('requestsPerSec')
+  const isBetter = isThroughput ? percent > 100 : percent < 100
+  return isBetter ? 'delta-better' : 'delta-worse'
+}
+
+function getSortedRuns() {
+  return [...history.runs].sort((a, b) => a.timestamp.localeCompare(b.timestamp))
+}
+
+function getLatestRun(runs) {
+  return runs.at(-1)
 }
 
 function populateRunsTable(runs) {
@@ -52,13 +101,41 @@ function populateRunsTable(runs) {
   }
 }
 
-function renderChart() {
-  const nodeVersion = nodeFilter.value
-  const metricPath = metricFilter.value
-  const runs = history.runs
-    .filter((run) => run.nodeVersion === nodeVersion)
-    .sort((a, b) => a.timestamp.localeCompare(b.timestamp))
+function populateComparisonTable(run, metricPath) {
+  comparisonTable.innerHTML = ''
 
+  if (!run) {
+    return
+  }
+
+  const baselineValue = getMetricValue(getBaselineResult(run), metricPath)
+  const variants = [...new Set(run.results.map((item) => item.variant))]
+  const orderedVariants = [
+    ...VARIANT_ORDER.filter((variant) => variants.includes(variant)),
+    ...variants.filter((variant) => !VARIANT_ORDER.includes(variant)),
+  ]
+
+  for (const variant of orderedVariants) {
+    const result = run.results.find((item) => item.variant === variant)
+    const value = result ? getMetricValue(result, metricPath) : null
+    const percent = getPercentOfBaseline(value, baselineValue)
+    const row = document.createElement('tr')
+    const deltaClass = getDeltaClass(metricPath, percent)
+
+    row.innerHTML = `
+      <td>${variant}</td>
+      <td>${formatAbsoluteValue(metricPath, value)}</td>
+      <td>${formatPercent(percent)}</td>
+      <td class="${deltaClass}">${formatDelta(percent)}</td>
+    `
+    comparisonTable.appendChild(row)
+  }
+}
+
+function renderChart() {
+  const metricPath = metricFilter.value
+  const view = viewFilter.value
+  const runs = getSortedRuns()
   const variants = [...new Set(runs.flatMap((run) => run.results.map((item) => item.variant)))]
 
   const labels = runs.map((run) => formatTimestamp(run.timestamp))
@@ -66,7 +143,14 @@ function renderChart() {
     label: variant,
     data: runs.map((run) => {
       const result = run.results.find((item) => item.variant === variant)
-      return result ? getMetricValue(result, metricPath) : null
+      const value = result ? getMetricValue(result, metricPath) : null
+
+      if (view === 'percent') {
+        const baselineValue = getMetricValue(getBaselineResult(run), metricPath)
+        return getPercentOfBaseline(value, baselineValue)
+      }
+
+      return value
     }),
     borderColor: VARIANT_COLORS[variant] ?? '#333',
     backgroundColor: VARIANT_COLORS[variant] ?? '#333',
@@ -78,6 +162,9 @@ function renderChart() {
     chart.destroy()
   }
 
+  const chartTitle =
+    view === 'percent' ? `${metricPath} (% of baseline)` : metricPath
+
   chart = new Chart(chartCanvas, {
     type: 'line',
     data: { labels, datasets },
@@ -87,18 +174,19 @@ function renderChart() {
         legend: { position: 'bottom' },
         title: {
           display: true,
-          text: `${metricPath} (${nodeVersion})`,
+          text: chartTitle,
         },
       },
       scales: {
         y: {
-          beginAtZero: metricPath.startsWith('latency') ? false : true,
+          beginAtZero: view === 'percent' ? false : !metricPath.startsWith('latency'),
         },
       },
     },
   })
 
   populateRunsTable(runs)
+  populateComparisonTable(getLatestRun(runs), metricPath)
 }
 
 async function init() {
@@ -108,9 +196,8 @@ async function init() {
       throw new Error(`Failed to load history.json (${response.status})`)
     }
     history = await response.json()
-    populateNodeFilter()
-    nodeFilter.addEventListener('change', renderChart)
     metricFilter.addEventListener('change', renderChart)
+    viewFilter.addEventListener('change', renderChart)
     renderChart()
     statusEl.textContent = `${history.runs.length} benchmark runs loaded.`
   } catch (error) {

@@ -1,6 +1,6 @@
 import autocannon from 'autocannon'
 import { execSync, spawn, type ChildProcess } from 'node:child_process'
-import { writeFileSync, mkdirSync } from 'node:fs'
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -81,7 +81,23 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
+function getServerDependencyVersion(packageName: string): string | undefined {
+  try {
+    const serverPkg = JSON.parse(
+      readFileSync(join(rootDir, 'apps/server/package.json'), 'utf8'),
+    ) as { dependencies?: Record<string, string> }
+    return serverPkg.dependencies?.[packageName]
+  } catch {
+    return undefined
+  }
+}
+
 function getPackageVersion(packageName: string): string | undefined {
+  const fromServerPackage = getServerDependencyVersion(packageName)
+  if (fromServerPackage) {
+    return fromServerPackage
+  }
+
   try {
     const pkg = require(`${packageName}/package.json`) as { version?: string }
     return pkg.version

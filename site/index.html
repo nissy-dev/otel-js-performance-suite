@@ -57,6 +57,20 @@
       .error {
         color: #b00020;
       }
+      .delta-better {
+        color: #2e7d32;
+      }
+      .delta-worse {
+        color: #c62828;
+      }
+      h2 {
+        margin-top: 2rem;
+        font-size: 1.1rem;
+      }
+      .comparison-table td:nth-child(n + 2),
+      .comparison-table th:nth-child(n + 2) {
+        text-align: right;
+      }
     </style>
   </head>
   <body>
@@ -67,10 +81,6 @@
 
     <div class="controls">
       <label>
-        Node version
-        <select id="nodeFilter"></select>
-      </label>
-      <label>
         Metric
         <select id="metricFilter">
           <option value="requestsPerSec.average">Requests/sec (avg)</option>
@@ -78,10 +88,30 @@
           <option value="latencyMs.p99">Latency p99 (ms)</option>
         </select>
       </label>
+      <label>
+        Chart view
+        <select id="viewFilter">
+          <option value="absolute">Absolute</option>
+          <option value="percent">% of baseline</option>
+        </select>
+      </label>
     </div>
 
     <canvas id="chart"></canvas>
     <p id="status"></p>
+
+    <h2>Latest run vs baseline</h2>
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>Variant</th>
+          <th>Value</th>
+          <th>% of baseline</th>
+          <th>Delta</th>
+        </tr>
+      </thead>
+      <tbody id="comparisonTable"></tbody>
+    </table>
 
     <table>
       <thead>

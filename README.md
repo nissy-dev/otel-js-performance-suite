@@ -56,7 +56,7 @@ BENCH_VARIANT=trace pnpm run server
 ## CI and dashboard
 
 - Workflow: [`.github/workflows/benchmark.yml`](.github/workflows/benchmark.yml)
-- Runs on pushes to `main` (when `package.json` changes) and manually
+- Runs every 3 days (03:00 UTC), on pushes to `main` (when `package.json` changes), and manually
 - Node.js: LTS (`lts/*` in CI)
 - Results committed to `results/` and deployed to GitHub Pages
 
