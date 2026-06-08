@@ -141,13 +141,3 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
-
-# Flamegraph / profiler outputs
-profiles/
-*.0x/
-cpu-profile-*.pb
-cpu-profile-*.html
-cpu-profile-*.md
-heap-profile-*.pb
-heap-profile-*.html
-heap-profile-*.md
