@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-07-04T04:18:33.478Z",
-  "commit": "cb49781",
+  "timestamp": "2026-07-07T06:50:07.608Z",
+  "commit": "79cf539",
   "nodeVersion": "v24.18.0",
   "environment": {
     "node": "v24.18.0",
@@ -12,66 +12,66 @@
     {
       "variant": "baseline",
       "requestsPerSec": {
-        "average": 5023.82,
-        "p50": 5059,
-        "p99": 5315
+        "average": 5117.28,
+        "p50": 5195,
+        "p99": 5559
       },
       "latencyMs": {
-        "average": 196.93,
-        "p50": 186,
-        "p99": 928
+        "average": 193.76,
+        "p50": 181,
+        "p99": 920
       }
     },
     {
       "variant": "trace",
       "requestsPerSec": {
-        "average": 5093.11,
-        "p50": 5163,
-        "p99": 5615
+        "average": 5101.37,
+        "p50": 5171,
+        "p99": 5711
       },
       "latencyMs": {
-        "average": 194.59,
-        "p50": 177,
-        "p99": 1170
+        "average": 193.95,
+        "p50": 180,
+        "p99": 978
       }
     },
     {
       "variant": "metrics",
       "requestsPerSec": {
-        "average": 4857.28,
-        "p50": 4959,
-        "p99": 5327
+        "average": 4831.9,
+        "p50": 4903,
+        "p99": 5099
       },
       "latencyMs": {
-        "average": 203.63,
-        "p50": 189,
-        "p99": 1062
+        "average": 204.35,
+        "p50": 190,
+        "p99": 1320
       }
     },
     {
       "variant": "logs",
       "requestsPerSec": {
-        "average": 4725.3,
-        "p50": 4795,
-        "p99": 5171
+        "average": 4480.9,
+        "p50": 4491,
+        "p99": 5055
       },
       "latencyMs": {
-        "average": 209.21,
-        "p50": 192,
-        "p99": 1400
+        "average": 220.84,
+        "p50": 204,
+        "p99": 1633
       }
     },
     {
       "variant": "full",
       "requestsPerSec": {
-        "average": 4551.3,
-        "p50": 4607,
-        "p99": 4879
+        "average": 4489.11,
+        "p50": 4543,
+        "p99": 4911
       },
       "latencyMs": {
-        "average": 216.69,
-        "p50": 199,
-        "p99": 1498
+        "average": 219.57,
+        "p50": 205,
+        "p99": 1592
       }
     }
   ]
