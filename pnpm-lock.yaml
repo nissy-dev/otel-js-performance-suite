@@ -21,8 +21,8 @@ importers:
   apps/server:
     dependencies:
       '@hono/node-server':
-        specifier: 2.0.4
-        version: 2.0.4(hono@4.12.23)
+        specifier: 2.0.6
+        version: 2.0.6(hono@4.12.27)
       '@opentelemetry/api':
         specifier: 1.9.1
         version: 1.9.1
@@ -60,8 +60,8 @@ importers:
         specifier: 1.41.1
         version: 1.41.1
       hono:
-        specifier: 4.12.23
-        version: 4.12.23
+        specifier: 4.12.27
+        version: 4.12.27
 
 packages:
 
@@ -237,8 +237,8 @@ packages:
     engines: {node: '>=6'}
     hasBin: true
 
-  '@hono/node-server@2.0.4':
-    resolution: {integrity: sha512-Ut3y0dMMPWy6bZ2kVfx25EOVbZlm15dhF4mOsezMlhpNHy+4MkU1qN9Y6lnruYi4wPmFzimGX2X7LF/FwHli4A==}
+  '@hono/node-server@2.0.6':
+    resolution: {integrity: sha512-7DeRlKG57JDBNZ5Qj2jwVdgwQy4b0tLubRLl3zCf91/rCf9i7p1V5FtW/yWibm1uUHE493ts9ZXH/7g/LQWl+g==}
     engines: {node: '>=20'}
     peerDependencies:
       hono: ^4
@@ -619,8 +619,8 @@ packages:
   hdr-histogram-percentiles-obj@3.0.0:
     resolution: {integrity: sha512-7kIufnBqdsBGcSZLPJwqHT3yhk1QTsSlFsVD3kx5ixH/AlgBs9yM1q6DPhXZ8f8gtdqgh7N7/5btRLpQsS2gHw==}
 
-  hono@4.12.23:
-    resolution: {integrity: sha512-eIaZ9qDgu7XV0pxOCrg7/WhnQ6Ivm22UcxhXx/A3dcbqbbYgBEkc6e/J/s7j2tS96zoB0S9VBdLwQNCWwUo4LA==}
+  hono@4.12.27:
+    resolution: {integrity: sha512-1yrb/+w6HWQJrUCLkJ2IF5jNIPvvFkblV5RNOYl6bV+OA6p9GLcMpHFFGTosSvHvcAUibuUukRqhlYI4z32C7Q==}
     engines: {node: '>=16.9.0'}
 
   http-parser-js@0.5.10:
@@ -872,9 +872,9 @@ snapshots:
       protobufjs: 7.6.5
       yargs: 17.7.3
 
-  '@hono/node-server@2.0.4(hono@4.12.23)':
+  '@hono/node-server@2.0.6(hono@4.12.27)':
     dependencies:
-      hono: 4.12.23
+      hono: 4.12.27
 
   '@js-sdsl/ordered-map@4.4.2': {}
 
@@ -1356,7 +1356,7 @@ snapshots:
 
   hdr-histogram-percentiles-obj@3.0.0: {}
 
-  hono@4.12.23: {}
+  hono@4.12.27: {}
 
   http-parser-js@0.5.10: {}
 
