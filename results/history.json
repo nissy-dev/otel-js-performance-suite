@@ -1402,6 +1402,84 @@
           }
         }
       ]
+    },
+    {
+      "timestamp": "2026-07-31T06:16:54.976Z",
+      "commit": "a1dffd4",
+      "nodeVersion": "v24.18.0",
+      "environment": {
+        "node": "v24.18.0",
+        "platform": "linux",
+        "hono": "4.12.27",
+        "@opentelemetry/sdk-node": "0.220.0"
+      },
+      "results": [
+        {
+          "variant": "baseline",
+          "requestsPerSec": {
+            "average": 5298.37,
+            "p50": 5239,
+            "p99": 5955
+          },
+          "latencyMs": {
+            "average": 186.7,
+            "p50": 174,
+            "p99": 803
+          }
+        },
+        {
+          "variant": "trace",
+          "requestsPerSec": {
+            "average": 5448.91,
+            "p50": 5655,
+            "p99": 5911
+          },
+          "latencyMs": {
+            "average": 181.82,
+            "p50": 171,
+            "p99": 807
+          }
+        },
+        {
+          "variant": "metrics",
+          "requestsPerSec": {
+            "average": 4994.37,
+            "p50": 4915,
+            "p99": 5487
+          },
+          "latencyMs": {
+            "average": 198.27,
+            "p50": 185,
+            "p99": 993
+          }
+        },
+        {
+          "variant": "logs",
+          "requestsPerSec": {
+            "average": 5085.61,
+            "p50": 5023,
+            "p99": 5651
+          },
+          "latencyMs": {
+            "average": 194.37,
+            "p50": 178,
+            "p99": 1122
+          }
+        },
+        {
+          "variant": "full",
+          "requestsPerSec": {
+            "average": 4741.11,
+            "p50": 4735,
+            "p99": 5211
+          },
+          "latencyMs": {
+            "average": 208.16,
+            "p50": 191,
+            "p99": 1354
+          }
+        }
+      ]
     }
   ]
 }
