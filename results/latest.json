@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-08-01T05:57:27.759Z",
-  "commit": "dbfe859",
+  "timestamp": "2026-08-04T05:50:36.104Z",
+  "commit": "2875e9a",
   "nodeVersion": "v24.18.0",
   "environment": {
     "node": "v24.18.0",
@@ -12,66 +12,66 @@
     {
       "variant": "baseline",
       "requestsPerSec": {
-        "average": 5146,
-        "p50": 4987,
-        "p99": 5915
+        "average": 5058.8,
+        "p50": 5067,
+        "p99": 5463
       },
       "latencyMs": {
-        "average": 192.34,
-        "p50": 179,
-        "p99": 1132
+        "average": 195.69,
+        "p50": 183,
+        "p99": 1165
       }
     },
     {
       "variant": "trace",
       "requestsPerSec": {
-        "average": 5084.28,
-        "p50": 5243,
-        "p99": 5511
+        "average": 5016.64,
+        "p50": 5175,
+        "p99": 5507
       },
       "latencyMs": {
-        "average": 194.95,
-        "p50": 183,
-        "p99": 1048
+        "average": 197.22,
+        "p50": 185,
+        "p99": 1012
       }
     },
     {
       "variant": "metrics",
       "requestsPerSec": {
-        "average": 4682.5,
-        "p50": 4767,
-        "p99": 5067
+        "average": 4651.7,
+        "p50": 4791,
+        "p99": 5023
       },
       "latencyMs": {
-        "average": 210.94,
-        "p50": 191,
-        "p99": 1498
+        "average": 212.57,
+        "p50": 192,
+        "p99": 1545
       }
     },
     {
       "variant": "logs",
       "requestsPerSec": {
-        "average": 4755.5,
-        "p50": 4907,
-        "p99": 5179
+        "average": 4703.55,
+        "p50": 4743,
+        "p99": 5103
       },
       "latencyMs": {
-        "average": 207.95,
-        "p50": 189,
-        "p99": 1394
+        "average": 210.38,
+        "p50": 194,
+        "p99": 1215
       }
     },
     {
       "variant": "full",
       "requestsPerSec": {
-        "average": 4653.37,
-        "p50": 4719,
-        "p99": 5007
+        "average": 4548.5,
+        "p50": 4627,
+        "p99": 4935
       },
       "latencyMs": {
-        "average": 212.79,
-        "p50": 200,
-        "p99": 1224
+        "average": 216.9,
+        "p50": 199,
+        "p99": 1470
       }
     }
   ]
