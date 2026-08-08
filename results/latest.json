@@ -1,77 +1,77 @@
 {
-  "timestamp": "2026-08-07T04:57:14.813Z",
-  "commit": "55def88",
+  "timestamp": "2026-08-08T08:35:07.047Z",
+  "commit": "b4855c1",
   "nodeVersion": "v24.18.0",
   "environment": {
     "node": "v24.18.0",
     "platform": "linux",
-    "hono": "4.12.27",
-    "@opentelemetry/sdk-node": "0.220.0"
+    "hono": "4.12.32",
+    "@opentelemetry/sdk-node": "0.221.0"
   },
   "results": [
     {
       "variant": "baseline",
       "requestsPerSec": {
-        "average": 6308.4,
-        "p50": 6279,
-        "p99": 6643
+        "average": 10558.19,
+        "p50": 10607,
+        "p99": 11215
       },
       "latencyMs": {
-        "average": 156.94,
-        "p50": 148,
-        "p99": 569
+        "average": 93.62,
+        "p50": 89,
+        "p99": 142
       }
     },
     {
       "variant": "trace",
       "requestsPerSec": {
-        "average": 6305.2,
-        "p50": 6399,
-        "p99": 6887
+        "average": 10898.4,
+        "p50": 11023,
+        "p99": 11599
       },
       "latencyMs": {
-        "average": 156.95,
-        "p50": 146,
-        "p99": 602
+        "average": 90.81,
+        "p50": 87,
+        "p99": 138
       }
     },
     {
       "variant": "metrics",
       "requestsPerSec": {
-        "average": 5726.8,
-        "p50": 5727,
-        "p99": 6439
+        "average": 9822.91,
+        "p50": 9887,
+        "p99": 10575
       },
       "latencyMs": {
-        "average": 172.89,
-        "p50": 161,
-        "p99": 901
+        "average": 100.77,
+        "p50": 98,
+        "p99": 151
       }
     },
     {
       "variant": "logs",
       "requestsPerSec": {
-        "average": 5937.64,
-        "p50": 5971,
-        "p99": 6443
+        "average": 9319.64,
+        "p50": 9263,
+        "p99": 10199
       },
       "latencyMs": {
-        "average": 166.8,
-        "p50": 155,
-        "p99": 603
+        "average": 106.32,
+        "p50": 101,
+        "p99": 179
       }
     },
     {
       "variant": "full",
       "requestsPerSec": {
-        "average": 5427.6,
-        "p50": 5471,
-        "p99": 5763
+        "average": 9166.21,
+        "p50": 9055,
+        "p99": 9919
       },
       "latencyMs": {
-        "average": 182.41,
-        "p50": 170,
-        "p99": 999
+        "average": 108.02,
+        "p50": 102,
+        "p99": 190
       }
     }
   ]
