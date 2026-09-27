@@ -16,6 +16,6 @@
     "@opentelemetry/sdk-node": "0.222.0",
     "@opentelemetry/sdk-trace-node": "2.11.0",
     "@opentelemetry/semantic-conventions": "1.43.0",
-    "hono": "4.13.5"
+    "hono": "4.13.9"
   }
 }
